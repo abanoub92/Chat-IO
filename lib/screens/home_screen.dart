@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import './chats_screen.dart';
+
 class HomeScreen extends StatefulWidget {
 
   const HomeScreen({Key key}) : super(key: key);
@@ -28,16 +30,43 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         title: Text('Chat IO'),
         actions: [
           IconButton(icon: Icon(Icons.search), onPressed: (){}),
-          IconButton(icon: Icon(Icons.more_vert), onPressed: (){})
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              print('Selected menu item $value');
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: Text('New group'),
+                value: 'New group',
+              ),
+              PopupMenuItem(
+                child: Text('New broadcast'),
+                value: 'New broadcast',
+              ),
+              PopupMenuItem(
+                child: Text('Whatsapp web'),
+                value: 'Whatsapp web',
+              ),
+              PopupMenuItem(
+                child: Text('Starred messages'),
+                value: 'Starred messages',
+              ),
+              PopupMenuItem(
+                child: Text('Settings'),
+                value: 'Settings',
+              )
+            ],
+          ),
         ],
         bottom: TabBar(
+            indicatorColor: Colors.white,
             controller: _controller,
             tabs: [
               /// camera tab to capture images and record videos
               Tab(icon: Icon(Icons.camera_alt)),
 
               /// chat tab to check the conversations list of chats
-              Tab(text: 'Chats')
+              Tab(text: 'CHATS')
             ]
         ),
       ),
@@ -46,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         physics: NeverScrollableScrollPhysics(),
         children: [
           Text('Camera'),
-          Text('Chats'),
+          ChatsScreen()
         ]
       )
     );
