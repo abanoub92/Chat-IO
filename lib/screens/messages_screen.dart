@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '/models/chat_model.dart';
+import '/items/item_message_own.dart';
+import '/items/item_message_member.dart';
 
 class MessagesScreen extends StatefulWidget {
 
@@ -22,6 +25,23 @@ class _MessagesScreenState extends State<MessagesScreen> {
   final _messageController = TextEditingController();
 
   ChatModel _model;
+  IO.Socket socket;
+
+  /// Connect the socket.io client to server
+  void onSocketConnect(){
+    socket = IO.io('http://192.168.1.12:5000', IO.OptionBuilder()  //192.168.1.124 192.168.1.12
+        .setTransports(['websocket']) // for Flutter or Dart VM
+        .disableAutoConnect()  // disable auto-connection
+        .build()
+    );
+
+    socket.connect();
+    socket.emit('/test', 'Hello World!');
+    socket.onConnect((_) {
+      print('Connected on Mobile');
+    });
+    print(socket.connected);
+  }
 
   /// build custom appbar for messaging screen
   AppBar _buildAppBar(){
@@ -110,9 +130,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
         child: Stack(
           children: [
             /// list of messages
-            ListView.builder(
-              itemCount: 0,
-              itemBuilder: (context, index) {},
+            Container(
+              height: MediaQuery.of(context).size.height - 140.0,
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  ItemMessageOwn(),
+                  ItemMessageMember(),
+                ],
+              ),
             ),
 
             /// message input and sender button
@@ -217,6 +243,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   void initState() {
+    onSocketConnect();
+
     _messageFocusNode.addListener(onFocusNodeChanged);
     super.initState();
   }
